@@ -1,4 +1,4 @@
-const config = requie("../../../knexfile")
+const config = require("../../../knexfile")
 
 const knex = require("knex")
 
