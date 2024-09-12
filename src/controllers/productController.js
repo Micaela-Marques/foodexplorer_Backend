@@ -2,6 +2,8 @@ const knex = require("../database/knex");
 
 class productController {
   async create(request, response) {
+
+
     try {
       const {
         name,
@@ -23,7 +25,7 @@ class productController {
       });
 
       await knex("ingredients").insert(
-        ingredients.map((ingredient) => ({ name:ingredient, product_id }))
+        ingredients.map((ingredient) => ({ name: ingredient, product_id, user_id }))
       );
 
       return response
@@ -35,34 +37,44 @@ class productController {
     }
   }
 
-  async get(request, response) {
+  async show(request, response) {
     const { id } = request.params;
-
-    const product = await knex("product").where({ id }).first();
-
-    const category = await knex("categories").where({
-      id: product.categories_id,
-    });
-
-    return response.json({
-      ...product,
-      ingredients: JSON.parse(product.ingredients),
-      category,
-    });
-  }
-
-  async delete(request, response) {
-    const { id } = request.params;
-
-    try {
-      const product = await knex("product").where({ id }).first();
+  
+    const product = await knex("product")
+      .where({ id })
+      .first();
 
       if (!product) {
         return response.status(404).json({ message: "Produto não encontrado" });
       }
+      const category = await knex("categories")
+      .where({ id: product.categories_id }) 
+      .first();
 
+    const ingredients = await knex("ingredients")
+      .where({ product_id: id }); 
+      
+  
+    return response.json({
+      ...product,
+      category,
+      ingredients: ingredients.map(ingredient => ingredient.name), 
+    });
+  }
+  
+
+  async delete(request, response) {
+    const { id } = request.params;
+  
+    try {
+      const product = await knex("product").where({ id }).first();
+  
+      if (!product) {
+        return response.status(404).json({ message: "Produto não encontrado" });
+      }
+  
       await knex("product").where({ id }).delete();
-
+  
       return response.status(204).send();
     } catch (error) {
       return response
@@ -70,44 +82,66 @@ class productController {
         .json({ message: "Erro ao excluir produto", error: error.message });
     }
   }
-
+  
   async index(request, response) {
-    const { title, user_id, ingredients } = request.query;
-    let ingredient
-
-    try {
-      if (!user_id) {
-        return response
-          .status(400)
-          .json({ message: "O campo 'user_id' é obrigatório." });
-      }
-
-      if (ingredients) {
-        const filterIngredients = ingredients.split(',').map(ingredient=> ingredient.trim());
-        ingredient = await knex("ingredients")
-         .whereIn("name", filterIngredients)
-        
-      }
-
-
-      let query = knex("product").where({ user_id });
-
-   
-      if (title) {
-        query = query.whereLike("name", `%${title}%`);
-      }
-
+    const { name, ingredients } = request.query;
     
-      const products = await query.orderBy("name");
-
- 
-      return response.json(products);
+    // Verifique se o usuário foi autenticado
+    console.log('Usuário autenticado:', request.user);
+    
+    const user_id = request.user ? request.user.id : null;
+  
+    if (!user_id) {
+      return response.status(400).json({ message: "Usuário não autenticado" });
+    }
+  
+    try {
+      let product;
+      if (ingredients) {
+        const filterIngredients = ingredients.split(',').map(ingredient => ingredient.trim());
+        console.log('Ingredientes filtrados:', filterIngredients);
+  
+        product = await knex("ingredients")
+          .select([
+            "product.id",
+            "product.name",
+            "product.user_id",
+          ])
+          .where("product.user_id", user_id)
+          .whereLike("product.name", `%${name}%`)
+          .whereIn("ingredients.name", filterIngredients)
+          .innerJoin("product", "product.id", "ingredients.product_id")
+          .groupBy("product.id")
+          .orderBy("product.name");
+      } else {
+        product = await knex("product")
+          .where({ user_id })
+          .whereLike("name", `%${name}%`)
+          .orderBy("name");
+      }
+  
+      const userIngredients = await knex("ingredients").where({ user_id });
+      const productWitheIngredients = product.map(product => {
+        const productIngredients = userIngredients.filter(ingredient => ingredient.product_id === product.id);
+  
+        return {
+          ...product,
+          ingredients: productIngredients,
+        };
+      });
+  
+      return response.json(productWitheIngredients);
     } catch (error) {
-      return response
-        .status(500)
-        .json({ message: "Erro ao buscar produtos", error: error.message });
+      console.error('Erro na busca dos produtos:', error);
+      return response.status(500).json({ message: "Erro ao buscar produtos", error: error.message });
     }
   }
-}
+  
+  
+  }
+  
+
+
+
 
 module.exports = productController;
