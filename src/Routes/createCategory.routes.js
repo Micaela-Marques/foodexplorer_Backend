@@ -13,12 +13,7 @@ const productController = new ProductController();
 // Aplica autenticação em todas as rotas
 productRoutes.use(ensureAuthenticated);
 
-// Rotas para gerenciar produtos
-productRoutes.post("/", upload.single("image"), productController.create); // Cria um novo produto
-productRoutes.get("/", productController.index); // Busca os produtos
-
-productRoutes.get("/:id", productController.show); // Exibe detalhes do produto pelo ID
-productRoutes.delete("/:id", productController.delete); // Remove um produto pelo ID
-productRoutes.put("/:id", upload.single("image"), productController.update); // Atualiza o produto pelo ID
+// Rota para buscar categorias
+productRoutes.get("/", productController.searchCategory); // Corrigido para usar `searchCategory`
 
 module.exports = productRoutes;

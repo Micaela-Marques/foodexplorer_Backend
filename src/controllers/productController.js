@@ -212,7 +212,32 @@ class productController  {
         .json({ message: "Erro ao excluir produto", error: error.message });
     }
   }
-
+  
+  async searchCategory(request, response) {
+    try {
+      // Executa uma consulta para buscar todas as categorias
+      const categories = await knex("categories")
+      .select("*");
+ 
+  
+      // Verifica se há categorias retornadas
+      if (categories.length === 0) {
+        return response.status(404).json({ message: "Nenhuma categoria encontrada." });
+      }
+     
+  
+      // Retorna todas as categorias encontradas
+      return response.json(categories);
+      
+    } catch (error) {
+      
+      console.error("Erro ao buscar categorias:", error);
+      return response.status(500).json({ error: "Erro ao buscar categorias" });
+ 
+    }
+  }
+  
 }
+  
 
 module.exports = productController;
