@@ -5,7 +5,7 @@ const sqliteConnection = require("../database/sqlite")
 class UsersController {
 //user creation
 async create(request, response) {
-    const { name, email, passwords } = request.body;
+    const { name, email, password } = request.body;
 
     const database = await sqliteConnection()
 //verify if users exist
@@ -16,7 +16,7 @@ async create(request, response) {
         throw new AppError("Este e-mail já está em uso", 400);
     }
 //encrypting password
-    const hashedPassword = await hash(passwords, 8)
+    const hashedPassword = await hash(password, 8)
 
 //Insert into database
 
