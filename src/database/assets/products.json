@@ -1,0 +1,115 @@
+[
+    {
+       
+        "name": "Espresso >",
+        "description": "Café cremoso feito na temperatura e pressões perfeitas.",
+        "price": 15.97,
+        "categories_id": 1,
+        "user_id": 1,
+        "image": null
+      },
+      {
+        
+      "name": "Suco de maracujá >",
+        "description": "Suco de maracujá gelado, cremoso, docinho.",
+         "price": 13.97,
+        "image": null,
+        "categories_id": 1,
+        "user_id": 1
+      },
+      {
+       
+        "name": "Tè d'autunno >",
+        "description":"Chá de anis, canela e limão. Sinta o outono italiano.",
+         "price": 19.97,
+        "image": null,
+        "categories_id": 1,
+        "user_id": 1
+      },
+      {
+        
+        "name": "Pomo bourbon >",
+        "description": "Maçã, whisky, canela. On the rocks.",
+         "price": 79.97,
+        "image": null,
+        "categories_id": 1,
+        "user_id": 1
+      }
+      ,
+      {
+        "name": "Salada Ravanello >",
+        "description": "Rabanetes, folhas verdes e molho agridoce salpicados com gergelim",
+         "price": 49.97,
+        "image": null,
+        "categories_id": 2,
+        "user_id": 1
+      },
+      {
+    
+        "name": "Spaguetti Gambe >",
+        "description": "Massa fresca com camarões e pesto.",
+         "price": 79.97,
+        "image": null,
+        "categories_id": 2,
+        "user_id": 1
+      },
+      {
+    
+        "name": "Torradas de Parma >",
+        "description":"Presunto de parma e rúcula em um pão com fermentação natural.",
+         "price": 25.97,
+        "image": null,
+        "categories_id": 2,
+        "user_id": 1
+      },
+      {
+       
+        "name": "Salada Molla >",
+        "description": "Massa fresca com camarões e pesto.",
+         "price": 79.97,
+        "image": null,
+        "categories_id": 2,
+        "user_id": 1
+      }
+      ,
+
+      {
+       
+        "name": "Prugna Pie >",
+        "description": "Torta de ameixa com massa amanteigada, polvilho em açúcar.",
+         "price": 79.97,
+        "image": null,
+        "categories_id": 3,
+        "user_id": 1
+      },
+      {
+       
+        "name": "Peachy pastrie >",
+        "description": "Delicioso folheado de pêssego com folhas de hortelã.",
+         "price": 32.97,
+        "image": null,
+        "categories_id": 3,
+        "user_id": 1
+      },
+      {
+    
+        "name": "Macarons >",
+        "description": "Farinha de amêndoas, manteiga, claras e açúcar.",
+         "price": 79.97,
+        "image": null,
+        "categories_id": 3,
+        "user_id": 1
+      },
+      {
+      
+        "name":"Bolo de damasco  >",
+        "description":"Damascos frescos em uma massa sem glúten.",
+         "price": 19.97,
+        "image": null,
+        "categories_id": 3,
+        "user_id": 1
+      }
+    ]
+    
+
+
