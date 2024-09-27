@@ -14,6 +14,10 @@ const productController = new ProductController();
 productRoutes.use(ensureAuthenticated);
 
 // Rota para buscar categorias
-productRoutes.get("/", productController.searchCategory); // Corrigido para usar `searchCategory`
+productRoutes.get("/", productController.listCategories); // Corrigido para usar `searchCategory`
+
+productRoutes.delete("/:id", productController.delete);
+
+
 
 module.exports = productRoutes;
