@@ -1,0 +1,70 @@
+### Get Token
+POST http://localhost:3000/sessions
+Content-Type: application/json
+
+{
+	"email": "micaela@gmail.com",
+	"password": "123456"
+}
+
+### List Products
+GET http://localhost:3000/product?category=1&name=
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+
+### List Categories
+GET http://localhost:3000/categories
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+### List Product by Id
+GET http://localhost:3000/product/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+### Update Image
+PATCH http://localhost:3000/product/1/image
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+{
+	"image": "image.jpg"
+}
+
+### List Cart
+GET http://localhost:3000/product/cart/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+### Create Product
+POST http://localhost:3000/product
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+{
+	"name": "Pizzaria",
+	"description": "Pizza de calabresa",
+	"price": 49.90,
+	"categories_id": 1,
+	"ingredients": ["Calabresa", "Mussarela"],
+	"image": "image.jpg"
+
+
+}
+
+### Update Product
+PUT http://localhost:3000/product/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjczOTkxNTAsImV4cCI6MTcyNzQ4NTU1MCwic3ViIjoiNCJ9.p2gWZ6UFSO2HJYFMEk4efCMZbQqBRAfYYfXX2mjwq1c
+
+{
+	"name": "Pizza",
+	"description": "Pizza de calabresa",
+	"price": 49.90,
+	"categories_id": 1,
+	"ingredients": ["Calabresa", "Mussarela"],
+	"image": "image.jpg"
+
+}
+

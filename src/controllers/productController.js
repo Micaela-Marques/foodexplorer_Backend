@@ -8,10 +8,6 @@ class ProductController {
       const { name, description, categories_id, price, ingredients } = request.body;
       const user_id = request.user.id;
 
-      // Validar dados de entrada
-      if (!name || !description || !categories_id || !price || !ingredients || !Array.isArray(ingredients)) {
-        throw new AppError("Dados inválidos para criar o produto.");
-      }
 
       // Verificar se o produto já existe
       const existingProduct = await knex("product").where({ name }).first();
@@ -19,11 +15,14 @@ class ProductController {
         throw new AppError("Este prato já existe no cardápio.");
       }
 
-      // Processar a imagem
-      const diskStorage = new DiskStorage();
-      const filename = request.file?.filename
-        ? await diskStorage.saveFile(request.file.filename)
-        : null;
+      const imageFileName = request.file?.filename;
+
+      if (!imageFileName) {
+        throw new Error("Arquivo de imagem não encontrado.");
+      }
+      const diskStorage = new DiskStorage()
+
+      const filename = await diskStorage.saveFile(imageFileName);
 
       // Inserir o produto
       const [product_id] = await knex("product").insert({
@@ -86,19 +85,19 @@ async delete(request, response) {
 
     try {
       const product = await knex("product").where({ id }).first();
-
+      
       if (!product) {
         return response.status(404).json({ message: "Produto não encontrado" });
       }
-
+      
       const category = await knex("categories")
-        .where({ id: product.categories_id })
-        .first();
-
+      .where({ id: product.categories_id })
+      .first();
+      
       const ingredients = await knex("ingredients")
         .where({ product_id: id })
         .select("name");
-
+        
       return response.json({
         ...product,
         category,
@@ -111,52 +110,56 @@ async delete(request, response) {
   }
   async update(request, response) {
     try {
-      const { name, description, ingredients, price, categories_id } =
-        request.body;
+      const { name, description, ingredients, price, categories_id } = request.body;
       const { id } = request.params;
-
+      console.log(request.body)
+      
       const product = await knex("product").where({ id }).first();
       if (!product) {
         return response.status(404).json({ error: "Esse prato não existe" });
       }
-
+      
       let filename;
-      if (request.file?.filename) {
+      if (request.file) {
+        const imageFileName = request.file.filename;
         const diskStorage = new DiskStorage();
+
         if (product.image) {
           await diskStorage.deleteFile(product.image);
         }
-        filename = await diskStorage.saveFile(request.file.filename);
+        filename = await diskStorage.saveFile(imageFileName);
       }
 
       await knex("product")
-        .where({ id })
-        .update({
-          image: filename || product.image,
-          name: name || product.name,
+      .where({ id })
+      .update({
+        image: filename || product.image,
+        name: name || product.name,
           description: description || product.description,
           categories_id: categories_id || product.categories_id,
           price: price || product.price,
         });
 
-      if (ingredients) {
-        await knex("ingredients").where({ product_id: id }).delete();
-        const ingredientsToInsert = Array.isArray(ingredients)
+        if (ingredients) {
+          await knex("ingredients").where({ product_id: id }).delete();
+          const ingredientsToInsert = Array.isArray(ingredients)
           ? ingredients.map((ingredient) => ({
-              name: ingredient,
-              product_id: id,
-            }))
+            name: ingredient,
+            product_id: id,
+          }))
           : [{ name: ingredients, product_id: id }];
-        await knex("ingredients").insert(ingredientsToInsert);
-      }
-
-      return response
+          await knex("ingredients").insert(ingredientsToInsert);
+        }
+        
+        return response
         .status(200)
         .json({ message: "Prato atualizado com sucesso" });
-    } catch (error) {
-      console.error(error);
+      } catch (error) {
+        console.error(error);
       return response.status(500).json({ error: "Erro interno do servidor" });
     }
+
+    
   }
   async delete(request, response) {
     const { id } = request.params;
@@ -186,8 +189,7 @@ async delete(request, response) {
   }
   async listProducts(request, response) {
     const { category, name } = request.query;
-    const user_id = request.user;
-    console.log(user_id);
+    const user = request.user;
 
     try {
       let query = knex("product")
@@ -203,7 +205,9 @@ async delete(request, response) {
         .leftJoin("categories", "product.categories_id", "categories.id")
         .leftJoin("ingredients", "product.id", "ingredients.product_id");
 
-      
+      if (user.role === "admin") {
+        query = query.where({ "product.user_id": user.id });
+      }
 
       if (category) {
         query = query.where(function() {
@@ -257,80 +261,6 @@ async delete(request, response) {
       return response.status(500).json({ error: "Erro ao listar categorias" });
     }
   }
-  async updatedProduct(request, response) {
-    const { id } = request.params;
-    const { name, description, price, categories_id, image } = request.body;
-
-    try {
-      const product = await knex("product").where({ id }).first();
-      if (!product) {
-        return response.status(404).json({ error: "Esse prato não existe" });
-      }
-
-      const diskStorage = new DiskStorage();
-
-      let filename = product.image;
-      if (image) {
-        if (product.image) {
-          await diskStorage.deleteFile(product.image);
-        }
-        filename = await diskStorage.saveFile(image);
-      }
-
-      const updatedProductData = {
-        name: name || product.name,
-        description: description || product.description,
-        price: price || product.price,
-        categories_id: categories_id || product.categories_id,
-        image: filename,
-      };
-
-      await knex("product").where({ id }).update(updatedProductData);
-
-      return response.json({ message: "Produto atualizado com sucesso", product: updatedProductData });
-    } catch (error) {
-      console.error("Erro ao atualizar dados do produto:", error);
-      return response.status(500).json({ error: "Erro ao atualizar dados do produto" });
-    }
-  }
-
-  async updateImage(request, response) {
-    console.log('Método updateImage chamado');
-    const product_id = request.params.id; // ID do produto a ser atualizado
-    const imageFilename = request.file?.filename; // Usa o operador ?. para garantir que o arquivo foi enviado
-
-    // Correção: avatarFilename para imageFilename
-    if (!product_id || !imageFilename) {
-        throw new AppError("Dados insuficientes para atualizar a imagem do produto", 400);
-    }
-
-    // Buscar o produto no banco de dados
-    const product = await knex("product")
-        .where({ id: product_id })
-        .first();
-
-    if (!product) {
-        throw new AppError("Produto não encontrado", 404);
-    }
-
-    // Deletar imagem antiga, se existir
-    if (product.image) { // Supondo que o campo da imagem seja `image`
-        await diskStorage.deleteFile(product.image);
-    }
-
-    // Salvar nova imagem
-    const filename = await diskStorage.saveFile(imageFilename);
-    product.image = filename; // Atualiza o campo da imagem no objeto product
-
-    // Atualizar produto no banco de dados
-    await knex("product")
-        .where({ id: product_id })
-        .update({ image: product.image });
-
-    // Retornar resposta com os dados atualizados do produto
-    return response.json(product);
-}
-
 async showCart(request, response) {
   const { id } = request.params;
 
